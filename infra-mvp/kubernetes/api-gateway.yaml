@@ -30,9 +30,14 @@ data:
   default.conf: |
     server {
       listen 8080;
-      location /auth/ { proxy_pass http://auth-stub/; }
-      location /users/ { proxy_pass http://user-stub/; }
-      location /lawyers/ { proxy_pass http://lawyer-stub/; }
+
+      location /auth/ {
+        proxy_pass http://auth-stub/;
+      }
+
+      location /health {
+        return 200;
+      }
     }
 ---
 apiVersion: v1
