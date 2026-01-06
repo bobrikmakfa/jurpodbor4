@@ -1,0 +1,47 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: api-gateway
+  namespace: mvp
+spec:
+  selector:
+    matchLabels: { app: api-gateway }
+  template:
+    metadata:
+      labels: { app: api-gateway }
+    spec:
+      containers:
+      - name: api-gateway
+        image: nginx:alpine
+        volumeMounts:
+        - name: conf
+          mountPath: /etc/nginx/conf.d
+      volumes:
+      - name: conf
+        configMap:
+          name: api-gateway-conf
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: api-gateway-conf
+  namespace: mvp
+data:
+  default.conf: |
+    server {
+      listen 8080;
+      location /auth/ { proxy_pass http://auth-stub/; }
+      location /users/ { proxy_pass http://user-stub/; }
+      location /lawyers/ { proxy_pass http://lawyer-stub/; }
+    }
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: api-gateway
+  namespace: mvp
+spec:
+  selector: { app: api-gateway }
+  ports:
+  - port: 80
+    targetPort: 8080

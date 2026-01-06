@@ -1,0 +1,25 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: auth-stub
+  namespace: mvp
+spec:
+  selector:
+    matchLabels: { app: auth-stub }
+  template:
+    metadata:
+      labels: { app: auth-stub }
+    spec:
+      containers:
+      - name: auth-stub
+        image: kennethreitz/httpbin
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: auth-stub
+  namespace: mvp
+spec:
+  selector: { app: auth-stub }
+  ports:
+  - port: 80
