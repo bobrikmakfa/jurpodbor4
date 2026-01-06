@@ -13,7 +13,7 @@ spec:
     spec:
       containers:
       - name: kafka
-        image: bitnami/kafka:3.6.1
+        image: bitnami/kafka:3.5.2
         imagePullPolicy: IfNotPresent
         env:
         - name: KAFKA_ENABLE_KRAFT
