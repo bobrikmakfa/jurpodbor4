@@ -11,6 +11,8 @@ spec:
     metadata:
       labels: { app: kafka }
     spec:
+      hostname: kafka
+      subdomain: kafka
       containers:
       - name: kafka
         image: confluentinc/cp-kafka:7.6.0
@@ -30,6 +32,12 @@ spec:
           value: PLAINTEXT
         - name: KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR
           value: "1"
+        - name: KAFKA_TRANSACTION_STATE_LOG_REPLICATION_FACTOR
+          value: "1"
+        - name: KAFKA_TRANSACTION_STATE_LOG_MIN_ISR
+          value: "1"
+        - name: KAFKA_GROUP_INITIAL_REBALANCE_DELAY_MS
+          value: "0"
         ports:
         - containerPort: 9092
 ---
@@ -39,6 +47,7 @@ metadata:
   name: kafka
   namespace: mvp
 spec:
+  clusterIP: None
   selector: { app: kafka }
   ports:
   - port: 9092
