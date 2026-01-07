@@ -3,7 +3,10 @@ kind: Ingress
 metadata:
   name: mvp-ingress
   namespace: mvp
+  annotations:
+    nginx.ingress.kubernetes.io/rewrite-target: /
 spec:
+  ingressClassName: nginx
   rules:
   - host: mvp.local
     http:
