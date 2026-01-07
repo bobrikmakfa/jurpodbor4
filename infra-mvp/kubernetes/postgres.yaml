@@ -1,32 +1,54 @@
-apiVersion: apps/v1
-kind: Deployment
-metadata:
-  name: postgres
-  namespace: mvp
-spec:
-  replicas: 1
-  selector:
-    matchLabels: { app: postgres }
-  template:
-    metadata:
-      labels: { app: postgres }
-    spec:
-      containers:
-      - name: postgres
-        image: postgres:15
-        env:
-        - { name: POSTGRES_USER, value: app }
-        - { name: POSTGRES_PASSWORD, value: app }
-        - { name: POSTGRES_DB, value: marketplace }
-        ports:
-        - containerPort: 5432
----
 apiVersion: v1
 kind: Service
 metadata:
   name: postgres
   namespace: mvp
 spec:
-  selector: { app: postgres }
   ports:
-  - port: 5432
+    - port: 5432
+      targetPort: 5432
+  selector:
+    app: postgres
+---
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: postgres
+  namespace: mvp
+spec:
+  serviceName: postgres
+  replicas: 1
+  selector:
+    matchLabels:
+      app: postgres
+  template:
+    metadata:
+      labels:
+        app: postgres
+    spec:
+      containers:
+        - name: postgres
+          image: postgres:15
+          ports:
+            - containerPort: 5432
+          env:
+            - name: POSTGRES_USER
+              value: app
+            - name: POSTGRES_DB
+              value: marketplace
+            - name: POSTGRES_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: app-secrets
+                  key: DB_PASSWORD
+          volumeMounts:
+            - name: data
+              mountPath: /var/lib/postgresql/data
+  volumeClaimTemplates:
+    - metadata:
+        name: data
+      spec:
+        accessModes: ["ReadWriteOnce"]
+        resources:
+          requests:
+            storage: 5Gi
