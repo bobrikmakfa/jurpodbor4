@@ -32,21 +32,26 @@ metadata:
   namespace: mvp
 data:
   default.conf: |
-    resolver kube-dns.kube-system.svc.cluster.local valid=10s;
-
     server {
       listen 80;
 
       location /auth/ {
-        proxy_set_header Host $host;
-        proxy_set_header X-Real-IP $remote_addr;
         proxy_pass http://auth-stub/;
+      }
+
+      location /user/ {
+        proxy_pass http://user-stub/;
+      }
+
+      location /lawyer/ {
+        proxy_pass http://lawyer-stub/;
       }
 
       location /health {
         return 200;
       }
     }
+
 ---
 apiVersion: v1
 kind: Service
