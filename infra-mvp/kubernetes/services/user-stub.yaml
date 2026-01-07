@@ -1,0 +1,25 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: user-stub
+  namespace: mvp
+spec:
+  selector:
+    matchLabels: { app: user-stub }
+  template:
+    metadata:
+      labels: { app: user-stub }
+    spec:
+      containers:
+      - name: user-stub
+        image: kennethreitz/httpbin
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: user-stub
+  namespace: mvp
+spec:
+  selector: { app: user-stub }
+  ports:
+  - port: 80
