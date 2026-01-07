@@ -5,21 +5,25 @@ metadata:
   namespace: mvp
 spec:
   selector:
-    matchLabels: { app: api-gateway }
+    matchLabels:
+      app: api-gateway
   template:
     metadata:
-      labels: { app: api-gateway }
+      labels:
+        app: api-gateway
     spec:
       containers:
-      - name: api-gateway
-        image: nginx:alpine
-        volumeMounts:
-        - name: conf
-          mountPath: /etc/nginx/conf.d
+        - name: api-gateway
+          image: nginx:alpine
+          ports:
+            - containerPort: 80
+          volumeMounts:
+            - name: conf
+              mountPath: /etc/nginx/conf.d
       volumes:
-      - name: conf
-        configMap:
-          name: api-gateway-conf
+        - name: conf
+          configMap:
+            name: api-gateway-conf
 ---
 apiVersion: v1
 kind: ConfigMap
@@ -28,10 +32,14 @@ metadata:
   namespace: mvp
 data:
   default.conf: |
+    resolver kube-dns.kube-system.svc.cluster.local valid=10s;
+
     server {
-      listen 8080;
+      listen 80;
 
       location /auth/ {
+        proxy_set_header Host $host;
+        proxy_set_header X-Real-IP $remote_addr;
         proxy_pass http://auth-stub/;
       }
 
@@ -46,7 +54,8 @@ metadata:
   name: api-gateway
   namespace: mvp
 spec:
-  selector: { app: api-gateway }
+  selector:
+    app: api-gateway
   ports:
-  - port: 80
-    targetPort: 8080
+    - port: 80
+      targetPort: 80
