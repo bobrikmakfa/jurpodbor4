@@ -1,0 +1,25 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: lawyer-stub
+  namespace: mvp
+spec:
+  selector:
+    matchLabels: { app: lawyer-stub }
+  template:
+    metadata:
+      labels: { app: lawyer-stub }
+    spec:
+      containers:
+      - name: lawyer-stub
+        image: kennethreitz/httpbin
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: lawyer-stub
+  namespace: mvp
+spec:
+  selector: { app: lawyer-stub }
+  ports:
+  - port: 80
