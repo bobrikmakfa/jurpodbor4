@@ -1,0 +1,15 @@
+stages:
+  - deploy
+
+deploy-mvp:
+  stage: deploy
+  image: bitnami/kubectl:latest
+  rules:
+    - if: $CI_COMMIT_BRANCH == "main"
+  script:
+    - mkdir -p ~/.kube
+    - echo "$KUBE_CONFIG" > ~/.kube/config
+    - kubectl get ns
+    - kubectl apply -f infra-mvp/kubernetes/services -n mvp
+    - kubectl apply -f infra-mvp/kubernetes/ -n mvp
+    - kubectl get pods -n mvp
