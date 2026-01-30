@@ -1,0 +1,16 @@
+stages:
+  - deploy
+
+deploy_mvp:
+  stage: deploy
+  image: bitnami/kubectl:latest
+  script:
+    - mkdir -p ~/.kube
+    - echo "$KUBE_CONFIG" > ~/.kube/config
+    - kubectl version --client
+    - kubectl get ns
+    - kubectl apply -f infra-mvp/kubernetes/services -n mvp
+    - kubectl apply -f infra-mvp/kubernetes -n mvp
+    - kubectl get pods -n mvp
+  only:
+    - main
